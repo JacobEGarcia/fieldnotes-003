@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FIELDNOTES / 003 - A Warning From Inside</title>
+<meta name="description" content="Somewhere Systems Fieldnotes 003. An interactive explainer: Jacob Coxon resigned from Anthropic with a warning about self-improving AI.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0d0d0c; --ink:#eceae4; --ink-dim:#8f8d86; --ink-faint:#55534e;
+  --red:#e5483f; --red-deep:#b33129; --line:rgba(236,234,228,.14);
+  --mono:'IBM Plex Mono',ui-monospace,Menlo,monospace;
+  --disp:'Anton','Arial Narrow',Impact,sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:var(--mono);overflow-x:hidden;-webkit-font-smoothing:antialiased}
+::selection{background:var(--red);color:#fff}
+#stage{position:fixed;inset:0;width:100vw;height:100vh;z-index:0;display:block}
+.chrome{position:fixed;z-index:5;left:0;right:0;display:flex;justify-content:space-between;align-items:center;padding:18px 26px;font-size:10px;letter-spacing:.14em;color:var(--ink-dim);pointer-events:none}
+.chrome.top{top:0;border-bottom:1px solid var(--line)}
+.chrome.bot{bottom:0;border-top:1px solid var(--line)}
+.chrome .brand{display:flex;align-items:center;gap:9px;color:var(--ink)}
+.chrome .mark{width:14px;height:14px;flex:none}
+.chrome .dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--red);margin-right:7px;animation:pulse 2.2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
+.chrome .r{text-align:right}
+body.lt .chrome{color:#6b6862;border-color:rgba(20,20,18,.16)}
+body.lt .chrome .brand{color:#141412}
+body.lt .chrome b{color:#141412}
+body.lt #rail a{color:#b3aea2}
+body.lt #rail a.on{color:var(--red-deep)}
+.chrome b{color:var(--ink);font-weight:500}
+#rail{position:fixed;right:22px;top:50%;transform:translateY(-50%);z-index:5;display:flex;flex-direction:column;gap:14px}
+#rail a{display:flex;align-items:center;gap:8px;text-decoration:none;color:var(--ink-faint);font-size:9px;letter-spacing:.14em;transition:color .3s}
+#rail a i{display:block;width:14px;height:1px;background:currentColor;transition:width .3s}
+#rail a.on{color:var(--red)}
+#rail a.on i{width:26px}
+main{position:relative;z-index:2}
+section{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:110px 8vw 90px;position:relative}
+.kick{font-size:10px;letter-spacing:.22em;color:var(--red);margin-bottom:26px}
+.kick::before{content:"";display:inline-block;width:22px;height:1px;background:var(--red);vertical-align:middle;margin-right:10px}
+.display{font-family:var(--disp);font-weight:400;font-size:clamp(52px,9.5vw,150px);line-height:.9;letter-spacing:.005em;text-transform:uppercase;color:var(--ink);max-width:9em}
+.sub{font-size:11px;letter-spacing:.18em;color:var(--ink-dim);margin-top:22px;text-transform:uppercase}
+.cap{font-size:11px;line-height:1.8;letter-spacing:.04em;color:var(--ink-dim);max-width:420px;margin-top:34px}
+.cap b{color:var(--ink);font-weight:500}
+.rule{height:1px;background:var(--line);width:100%;margin:26px 0}
+/* light section */
+.light .display,.light .kick{color:#141412}
+.light .kick{color:var(--red-deep)}
+.light .sub,.light .cap{color:#6b6862}
+.light .cap b{color:#141412}
+/* tweet cards */
+.card{background:#f4f3ef;color:#191917;border-radius:10px;padding:16px 18px 14px;width:min(340px,88vw);box-shadow:0 18px 50px rgba(0,0,0,.45);margin-top:30px}
+.card.lightcard{box-shadow:0 14px 34px rgba(20,20,18,.16);border:1px solid rgba(20,20,18,.09)}
+.card .ch{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.card .av{width:34px;height:34px;border-radius:50%;background:#191917;color:#f4f3ef;display:flex;align-items:center;justify-content:center;font-family:var(--disp);font-size:14px;flex:none}
+.card .nm{font-weight:600;font-size:13.5px;display:flex;align-items:center;gap:4px}
+.card .nm svg{flex:none}
+.card .hd{color:#6b6863;font-size:11.5px}
+.card .tx{font-size:15px;line-height:1.45;letter-spacing:0}
+.card .ft{margin-top:10px;font-size:10.5px;color:#8a8880;letter-spacing:.06em;text-transform:uppercase}
+.cardtag{font-size:9px;letter-spacing:.2em;color:var(--red);margin-top:34px}
+/* flow diagram s1 */
+.flow{display:flex;align-items:center;gap:16px;margin-top:30px;font-size:11px;letter-spacing:.16em}
+.flow .lab{padding:10px 14px;border:1px solid var(--line);color:var(--ink)}
+.flow .arr{color:var(--red);font-size:15px}
+/* slider */
+.sliderwrap{margin-top:44px;width:min(430px,86vw)}
+.sliderlab{display:flex;justify-content:space-between;font-size:9px;letter-spacing:.16em;color:var(--ink-faint);margin-bottom:14px}
+.sliderlab span{transition:color .3s}
+.sliderlab span.on{color:var(--red)}
+#sliderTrack{position:relative;height:26px;cursor:pointer;touch-action:none}
+#sliderTrack::before{content:"";position:absolute;left:0;right:0;top:12px;height:2px;background:var(--ink-faint)}
+#sliderFill{position:absolute;left:0;top:12px;height:2px;background:var(--red);width:50%}
+#sliderThumb{position:absolute;top:4px;left:50%;width:18px;height:18px;background:var(--red);transform:translateX(-50%) rotate(45deg);box-shadow:0 0 0 4px rgba(229,72,63,.18)}
+.sliderread{margin-top:16px;font-size:10px;letter-spacing:.18em;color:var(--ink-dim)}
+.sliderread b{color:var(--red);font-weight:600}
+/* tight section */
+.tight .display{font-size:clamp(44px,7.6vw,116px)}
+.tight .sliderwrap{margin-top:30px}
+.tight .card{margin-top:22px}
+.tight .cap{margin-top:22px}
+/* stat row s6 */
+.stats{display:flex;gap:0;margin-top:44px;flex-wrap:wrap}
+.stat{border:1px solid rgba(20,20,18,.22);padding:18px 22px;min-width:170px;flex:1;max-width:240px}
+.stat+.stat{border-left:none}
+.stat .n{font-family:var(--disp);font-size:44px;color:#141412;line-height:1}
+.stat .n em{font-style:normal;color:var(--red-deep);font-size:22px;vertical-align:top}
+.stat .d{font-size:9.5px;letter-spacing:.12em;color:#6b6862;margin-top:10px;line-height:1.7;text-transform:uppercase}
+/* vote s7 */
+.vote{display:flex;gap:10px;margin-top:40px;flex-wrap:wrap}
+.vote button{font-family:var(--mono);font-size:11px;letter-spacing:.16em;padding:16px 26px;background:transparent;color:var(--ink);border:1px solid var(--line);cursor:pointer;transition:all .25s}
+.vote button:hover{border-color:var(--ink)}
+.vote button.sel{background:var(--red);border-color:var(--red);color:#fff}
+.tally{margin-top:26px;width:min(430px,86vw);display:none}
+.tally.show{display:block}
+.tally .row{display:flex;align-items:center;gap:12px;margin-top:9px;font-size:9.5px;letter-spacing:.14em;color:var(--ink-dim)}
+.tally .row .bar{flex:1;height:2px;background:var(--ink-faint);position:relative}
+.tally .row .bar i{position:absolute;left:0;top:0;bottom:0;background:var(--red);width:0;transition:width .8s cubic-bezier(.2,.8,.2,1)}
+.tally .row .pct{width:38px;text-align:right;color:var(--ink)}
+.tallynote{margin-top:14px;font-size:9px;letter-spacing:.14em;color:var(--ink-faint)}
+.cta{display:inline-block;margin-top:36px;background:var(--red);color:#fff;border:none;font-family:var(--mono);font-size:11px;letter-spacing:.2em;padding:16px 30px;cursor:pointer;transition:background .25s}
+.cta:hover{background:var(--red-deep)}
+.cta.copied{background:#1f7a3d}
+/* footer */
+footer{position:relative;z-index:2;border-top:1px solid var(--line);padding:44px 8vw 120px;font-size:9.5px;letter-spacing:.12em;color:var(--ink-faint);line-height:2.1}
+footer a{color:var(--ink-dim);text-decoration:none;border-bottom:1px solid var(--line)}
+footer a:hover{color:var(--red);border-color:var(--red)}
+footer .ft-title{color:var(--ink);font-size:10px;letter-spacing:.2em;margin-bottom:12px}
+/* reveal */
+.rev{opacity:0;transform:translateY(22px);transition:opacity .9s cubic-bezier(.2,.7,.2,1),transform .9s cubic-bezier(.2,.7,.2,1)}
+.rev.in{opacity:1;transform:none}
+.rev.d1{transition-delay:.12s}.rev.d2{transition-delay:.24s}.rev.d3{transition-delay:.36s}.rev.d4{transition-delay:.48s}
+@media (prefers-reduced-motion:reduce){.rev{opacity:1;transform:none;transition:none}.chrome .dot{animation:none}}
+@media (max-width:760px){
+  section{padding:100px 7vw 80px}
+  #rail{display:none}
+  .chrome{padding:14px 16px;font-size:9px}
+  .display{font-size:clamp(44px,13vw,80px)}
+  .stat+.stat{border-left:1px solid rgba(20,20,18,.22)}
+}
+</style>
+</head>
+<body>
+<canvas id="stage"></canvas>
+
+<div class="chrome top">
+  <div class="brand">
+    <svg class="mark" viewBox="0 0 14 14"><path d="M1 12 L7 2 L13 12" fill="none" stroke="#e5483f" stroke-width="2.4"/></svg>
+    SOMEWHERE SYSTEMS
+  </div>
+  <div class="r"><span class="dot"></span>SITUATION MONITOR &nbsp;/&nbsp; <b>FIELDNOTES / 003</b></div>
+</div>
+
+<div id="rail"></div>
+
+<main>
+
+<section class="sec" id="s0">
+  <div class="kick rev">00 / RESPONSIBILITY</div>
+  <h1 class="display rev d1">A WARNING<br>FROM INSIDE.</h1>
+  <div class="cardtag rev d2">R / JACOB COXON / EXCERPT</div>
+  <div class="card rev d2">
+    <div class="ch">
+      <div class="av">JC</div>
+      <div><div class="nm">Jacob Coxon <svg width="13" height="13" viewBox="0 0 24 24"><path fill="#1d9bf0" d="M12 1.8l2.4 2 3.1-.4 1.1 2.9 2.9 1.1-.4 3.1 2 2.4-2 2.4.4 3.1-2.9 1.1-1.1 2.9-3.1-.4-2.4 2-2.4-2-3.1.4-1.1-2.9-2.9-1.1.4-3.1-2-2.4 2-2.4-.4-3.1 2.9-1.1 1.1-2.9 3.1.4z"/><path fill="#fff" d="M10.6 15.6l-3-3 1.3-1.3 1.7 1.7 4.5-4.5 1.3 1.3z"/></svg></div><div class="hd">via X &middot; Sep 8</div></div>
+    </div>
+    <div class="tx">I resigned from Anthropic today.</div>
+    <div class="ft">Resignation thread &middot; 08 Sep 2026 UTC</div>
+  </div>
+  <p class="cap rev d3">An Anthropic researcher has quit, warning that the race to build more powerful AI <b>could put humanity at risk</b>.</p>
+</section>
+
+<section class="sec" id="s1">
+  <div class="kick rev">01 / THE RESEARCHER</div>
+  <h2 class="display rev d1">JACOB<br>COXON.</h2>
+  <div class="flow rev d2">
+    <span class="lab">OpenAI</span><span class="arr">&rarr;</span><span class="lab">Anthropic</span>
+  </div>
+  <div class="sub rev d2">Pre-training research &middot; three years across both labs</div>
+  <div class="cardtag rev d3">R / JACOB COXON / EXCERPT</div>
+  <div class="card rev d3">
+    <div class="ch">
+      <div class="av">JC</div>
+      <div><div class="nm">Jacob Coxon <svg width="13" height="13" viewBox="0 0 24 24"><path fill="#1d9bf0" d="M12 1.8l2.4 2 3.1-.4 1.1 2.9 2.9 1.1-.4 3.1 2 2.4-2 2.4.4 3.1-2.9 1.1-1.1 2.9-3.1-.4-2.4 2-2.4-2-3.1.4-1.1-2.9-2.9-1.1.4-3.1-2-2.4 2-2.4-.4-3.1 2.9-1.1 1.1-2.9 3.1.4z"/><path fill="#fff" d="M10.6 15.6l-3-3 1.3-1.3 1.7 1.7 4.5-4.5 1.3 1.3z"/></svg></div><div class="hd">via X &middot; Sep 8</div></div>
+    </div>
+    <div class="tx">They are racing straight to self-improving superintelligence and gambling with our lives.</div>
+    <div class="ft">Resignation thread &middot; 08 Sep 2026 UTC</div>
+  </div>
+  <p class="cap rev d4">His account of his work and departure. The people racing to build this technology, he wrote, <b>&ldquo;earnestly believe it could kill us all by the end of the decade.&rdquo;</b></p>
+</section>
+
+<section class="sec" id="s2">
+  <div class="kick rev">02 / THE FEEDBACK LOOP</div>
+  <h2 class="display rev d1">AI BUILDS<br>BETTER AI.</h2>
+  <div class="sub rev d2">Capability feeds capability &middot; a conceptual feedback loop</div>
+  <p class="cap rev d3">A conceptual explanation of Coxon&rsquo;s concern. His concern is <b>self-improving AI</b>: systems helping build more capable systems, in a loop that people might struggle to control.</p>
+</section>
+
+<section class="sec tight" id="s3">
+  <div class="kick rev">03 / THE ARGUMENT</div>
+  <h2 class="display rev d1">THE PRESSURE<br>TO GO FIRST.</h2>
+  <div class="sliderwrap rev d2" id="sliderWrap">
+    <div class="sliderlab"><span data-b="0">SHARED PRESSURE</span><span data-b="1">NO GUARDS</span><span data-b="2">FINISH LINE</span></div>
+    <div id="sliderTrack" role="slider" aria-label="Competitive pressure" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50" tabindex="0">
+      <div id="sliderFill"></div><div id="sliderThumb"></div>
+    </div>
+    <div class="sliderread">PRESSURE INDEX &nbsp;<b id="pressVal">0.50</b>&nbsp; / &nbsp;DRAG THE MARKER</div>
+  </div>
+  <div class="cardtag rev d3">R / JACOB COXON / EXCERPT</div>
+  <div class="card rev d3">
+    <div class="ch">
+      <div class="av">JC</div>
+      <div><div class="nm">Jacob Coxon <svg width="13" height="13" viewBox="0 0 24 24"><path fill="#1d9bf0" d="M12 1.8l2.4 2 3.1-.4 1.1 2.9 2.9 1.1-.4 3.1 2 2.4-2 2.4.4 3.1-2.9 1.1-1.1 2.9-3.1-.4-2.4 2-2.4-2-3.1.4-1.1-2.9-2.9-1.1.4-3.1-2-2.4 2-2.4-.4-3.1 2.9-1.1 1.1-2.9 3.1.4z"/><path fill="#fff" d="M10.6 15.6l-3-3 1.3-1.3 1.7 1.7 4.5-4.5 1.3 1.3z"/></svg></div><div class="hd">via X &middot; Sep 8</div></div>
+    </div>
+    <div class="tx">At Anthropic, the stakes are well-understood, but they are locked in a race to get there first.</div>
+    <div class="ft">Resignation thread &middot; 08 Sep 2026 UTC</div>
+  </div>
+  <p class="cap rev d4">His attributed account of the lab&rsquo;s incentives: they believe no one else will act responsibly, so they must do it themselves, <b>despite the risk</b>.</p>
+</section>
+
+<section class="sec" id="s4">
+  <div class="kick rev">04 / A RESEARCHER RESPONDS</div>
+  <h2 class="display rev d1">THE CONCERN<br>IS SHARED.</h2>
+  <div class="sub rev d2">Evan Hubinger &middot; alignment research &middot; personal posts, not a company statement</div>
+  <div class="cardtag rev d3">R / EVAN HUBINGER / EXCERPT</div>
+  <div class="card rev d3">
+    <div class="ch">
+      <div class="av">EH</div>
+      <div><div class="nm">Evan Hubinger <svg width="13" height="13" viewBox="0 0 24 24"><path fill="#1d9bf0" d="M12 1.8l2.4 2 3.1-.4 1.1 2.9 2.9 1.1-.4 3.1 2 2.4-2 2.4.4 3.1-2.9 1.1-1.1 2.9-3.1-.4-2.4 2-2.4-2-3.1.4-1.1-2.9-2.9-1.1.4-3.1-2-2.4 2-2.4-.4-3.1 2.9-1.1 1.1-2.9 3.1.4z"/><path fill="#fff" d="M10.6 15.6l-3-3 1.3-1.3 1.7 1.7 4.5-4.5 1.3 1.3z"/></svg></div><div class="hd">via X &middot; Sep 9</div></div>
+    </div>
+    <div class="tx">We earnestly believe AI could kill all humans.</div>
+    <div class="ft">Personal post &middot; reported Sep 9, 2026</div>
+  </div>
+  <div class="card rev d4">
+    <div class="ch">
+      <div class="av">EH</div>
+      <div><div class="nm">Evan Hubinger <svg width="13" height="13" viewBox="0 0 24 24"><path fill="#1d9bf0" d="M12 1.8l2.4 2 3.1-.4 1.1 2.9 2.9 1.1-.4 3.1 2 2.4-2 2.4.4 3.1-2.9 1.1-1.1 2.9-3.1-.4-2.4 2-2.4-2-3.1.4-1.1-2.9-2.9-1.1.4-3.1-2-2.4 2-2.4-.4-3.1 2.9-1.1 1.1-2.9 3.1.4z"/><path fill="#fff" d="M10.6 15.6l-3-3 1.3-1.3 1.7 1.7 4.5-4.5 1.3 1.3z"/></svg></div><div class="hd">via X &middot; Sep 9</div></div>
+    </div>
+    <div class="tx">We do not yet have a plan to solve alignment for superintelligence, and are not clearly on track to.</div>
+    <div class="ft">Personal post &middot; reported Sep 9, 2026</div>
+  </div>
+  <p class="cap rev d4">He believes the company is trying its best. He also puts the likelihood of the worst outcome <b>above 10% within the next decade</b>.</p>
+</section>
+
+<section class="sec" id="s5">
+  <div class="kick rev">05 / WHAT ALIGNMENT MEANS</div>
+  <h2 class="display rev d1">CAPABILITY.<br>AND CONTROL.</h2>
+  <div class="sub rev d2">More capable, still aligned? The problem in plain language</div>
+  <p class="cap rev d3">A conceptual explanation. Alignment means getting systems to reliably <b>follow intended goals</b>, even as their capabilities grow.</p>
+</section>
+
+<section class="sec light" id="s6">
+  <div class="kick rev">06 / THE LIMIT OF THE EVIDENCE</div>
+  <h2 class="display rev d1">A WARNING.<br>AN OPEN QUESTION.</h2>
+  <div class="sub rev d2">Likelihood: ? &nbsp;&middot;&nbsp; Timeline: ?</div>
+  <p class="cap rev d3"><b>A warning is not a forecast.</b> An editorial distinction: a warning speaks to probability and evidence, not to a date on a calendar.</p>
+  <div class="stats rev d4">
+    <div class="stat"><div class="n">&gt;10<em>%</em></div><div class="d">Hubinger&rsquo;s stated likelihood of the worst outcome within a decade</div></div>
+    <div class="stat"><div class="n">2</div><div class="d">Bills introduced last week to ban superintelligence &middot; US + UK</div></div>
+    <div class="stat"><div class="n">$4<em>B</em></div><div class="d">Valuation of two new startups racing to build self-improving AI</div></div>
+  </div>
+</section>
+
+<section class="sec" id="s7">
+  <div class="kick rev">YOUR TURN / 003</div>
+  <h2 class="display rev d1">WHO GETS<br>TO DECIDE?</h2>
+  <div class="sub rev d2">Who should set acceptable risk?</div>
+  <div class="vote rev d3" id="voteBox">
+    <button data-v="labs">THE LABS</button>
+    <button data-v="gov">GOVERNMENTS</button>
+    <button data-v="pub">THE PUBLIC</button>
+  </div>
+  <div class="tally" id="tally">
+    <div class="row"><span style="width:96px">THE LABS</span><div class="bar"><i id="b-labs"></i></div><span class="pct" id="p-labs">0%</span></div>
+    <div class="row"><span style="width:96px">GOVERNMENTS</span><div class="bar"><i id="b-gov"></i></div><span class="pct" id="p-gov">0%</span></div>
+    <div class="row"><span style="width:96px">THE PUBLIC</span><div class="bar"><i id="b-pub"></i></div><span class="pct" id="p-pub">0%</span></div>
+    <div class="tallynote" id="tallyNote">RECORDED ON THIS DEVICE ONLY</div>
+  </div>
+  <div><button class="cta rev d4" id="ctaBtn">WHAT DO YOU THINK? &nbsp;&rarr;</button></div>
+  <p class="cap rev d4">Discuss below. Somewhere Systems.</p>
+</section>
+
+</main>
+
+<footer>
+  <div class="ft-title">FIELDNOTES / 003 &mdash; SOURCES &amp; RECORD</div>
+  Reported September 9&ndash;10, 2026:
+  <a href="https://techcrunch.com/2026/09/09/gambling-with-our-lives-anthropic-researcher-quits-warns-against-self-improving-ai/">TechCrunch</a> &middot;
+  <a href="https://arstechnica.com/ai/2026/09/anthropic-researcher-quits-with-a-warning-self-improving-ai-could-kill-us-all/">Ars Technica</a> &middot;
+  <a href="https://www.wired.com/story/anthropic-researcher-quits-jacob-coxon-ai-fears-humanity/">Wired</a> &middot;
+  <a href="https://www.wsj.com/tech/ai/anthropic-researcher-quits-over-out-of-control-ai-fears-707b7628">WSJ</a><br>
+  Built from the post <a href="https://x.com/somewheresy/status/2098031774588711162">&ldquo;Building a new machine for monitoring situations&rdquo;</a> by @somewheresy.<br>
+  Suspended Core / conceptual study &middot; rendered live in your browser &middot; Somewhere Systems.
+</footer>
+
+<div class="chrome bot">
+  <div><b>09 SEP 2026</b> &nbsp;&mdash;&nbsp; ISSUE 003</div>
+  <div class="r">SOMEWHERE SYSTEMS</div>
+</div>
+
+<script>
+/* FIELDNOTES 003 - suspended core engine. zero dependencies. */
+"use strict";
+if(location.search.includes("snap"))document.documentElement.style.scrollBehavior="auto";
+const cv=document.getElementById('stage'),ctx=cv.getContext('2d');
+const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
+let W=0,H=0,DPR=1;
+function resize(){DPR=Math.min(devicePixelRatio||1,2);W=innerWidth;H=innerHeight;cv.width=W*DPR;cv.height=H*DPR;ctx.setTransform(DPR,0,0,DPR,0,0);}
+addEventListener('resize',resize);resize();
+
+/* ---------- tiny 3d ---------- */
+const V=(x,y,z)=>({x,y,z});
+const sub=(a,b)=>V(a.x-b.x,a.y-b.y,a.z-b.z);
+const cross=(a,b)=>V(a.y*b.z-a.z*b.y,a.z*b.x-a.x*b.z,a.x*b.y-a.y*b.x);
+const dot=(a,b)=>a.x*b.x+a.y*b.y+a.z*b.z;
+const norm=a=>{const l=Math.hypot(a.x,a.y,a.z)||1;return V(a.x/l,a.y/l,a.z/l);};
+const LIGHT=norm(V(.45,.85,.35));
+
+const CAM={ang:.7,el:.34,dist:7.2,tgt:V(0,0,0)};
+function camBasis(){
+  const ce=Math.cos(CAM.el),eye=V(CAM.tgt.x+CAM.dist*ce*Math.sin(CAM.ang),CAM.tgt.y+CAM.dist*Math.sin(CAM.el),CAM.tgt.z+CAM.dist*ce*Math.cos(CAM.ang));
+  const fw=norm(sub(CAM.tgt,eye)),ri=norm(cross(fw,V(0,1,0))),up=cross(ri,fw);
+  return{eye,fw,ri,up};
+}
+let CB=camBasis();
+function proj(p){
+  const d=sub(p,CB.eye),x=dot(d,CB.ri),y=dot(d,CB.up),z=dot(d,CB.fw);
+  const f=H*1.55,s=f/Math.max(z,.4);
+  return{x:W/2+x*s+SCN.offX*W,y:H/2-y*s+SCN.offY*H,z,s};
+}
+
+/* ---------- machine geometry: exploded octagonal ring stack ---------- */
+const SEG=8;
+const PLATES=[
+  {r:1.00,ir:.30,y:.66,h:.11,m:'light',collar:true},
+  {r:.99,ir:.28,y:.47,h:.15,m:'dark'},
+  {r:.97,ir:.26,y:.29,h:.07,m:'core'},
+  {r:.95,ir:.24,y:.13,h:.15,m:'light'},
+  {r:.93,ir:.20,y:-.05,h:.07,m:'core'},
+  {r:.91,ir:.16,y:-.21,h:.15,m:'dark'},
+  {r:.88,ir:.12,y:-.38,h:.10,m:'light'},
+];
+function octPt(r,i,y){const a=(i/SEG)*Math.PI*2+Math.PI/8;return V(r*Math.cos(a),y,r*Math.sin(a));}
+function buildFaces(origin,scale,explode,bob){
+  const faces=[];
+  PLATES.forEach((p,pi)=>{
+    const gap=pi*explode*.34;
+    const yC=origin.y+(p.y-gap)*scale+bob;
+    const yT=yC+p.h*scale/2,yB=yC-p.h*scale/2;
+    const Ro=p.r*scale,Ri=p.ir*scale;
+    for(let i=0;i<SEG;i++){
+      const j=(i+1)%SEG;
+      const ot=[octPt(Ro,i,yT),octPt(Ro,j,yT)],ob=[octPt(Ro,i,yB),octPt(Ro,j,yB)];
+      const it=[octPt(Ri,i,yT),octPt(Ri,j,yT)],ib=[octPt(Ri,i,yB),octPt(Ri,j,yB)];
+      const ox=origin.x,oz=origin.z;
+      const sh=(a,b,c,d2,m,nrm)=>faces.push({p:[a,b,c,d2].map(q=>V(q.x+ox,q.y,q.z+oz)),m,n:nrm});
+      // top annulus
+      sh(ot[0],ot[1],it[1],it[0],p.m,V(0,1,0));
+      // bottom annulus
+      sh(ob[0],ib[0],ib[1],ob[1],p.m,V(0,-1,0));
+      // outer wall
+      const on=norm(V(Math.cos((i+.5)/SEG*Math.PI*2+Math.PI/8),0,Math.sin((i+.5)/SEG*Math.PI*2+Math.PI/8)));
+      sh(ob[0],ob[1],ot[1],ot[0],p.m,on);
+      // inner wall
+      sh(ib[0],it[0],it[1],ib[1],p.m,V(-on.x,0,-on.z));
+    }
+    if(p.collar){
+      const cr=p.r*.42,cr2=p.r*.34,chh=p.h*1.9;
+      const cyT=yT+chh*scale*.5,cyB=yT;
+      for(let i=0;i<SEG;i++){
+        const j=(i+1)%SEG;
+        const a1=octPt(cr,i,cyT),a2=octPt(cr,j,cyT),b1=octPt(cr2,i,cyT),b2=octPt(cr2,j,cyT);
+        const c1=octPt(cr,i,cyB),c2=octPt(cr,j,cyB),d1=octPt(cr2,i,cyB),d2=octPt(cr2,j,cyB);
+        const ox=origin.x,oz=origin.z;
+        faces.push({p:[a1,a2,b2,b1].map(q=>V(q.x+ox,q.y,q.z+oz)),m:'dark',n:V(0,1,0)});
+        const on=norm(V(Math.cos((i+.5)/SEG*Math.PI*2+Math.PI/8),0,Math.sin((i+.5)/SEG*Math.PI*2+Math.PI/8)));
+        faces.push({p:[c1,c2,a2,a1].map(q=>V(q.x+ox,q.y,q.z+oz)),m:'dark',n:on});
+        faces.push({p:[d1,b1,b2,d2].map(q=>V(q.x+ox,q.y,q.z+oz)),m:'dark',n:V(-on.x,0,-on.z)});
+      }
+    }
+  });
+  return faces;
+}
+
+/* ---------- palette ---------- */
+const THEME={
+  dark:{bg:[13,13,12],light:[168,173,178],darkp:[38,41,44],core:[229,72,63],inkline:'rgba(236,234,228,',grain:.05},
+  light:{bg:[239,236,231],light:[244,242,238],darkp:[58,61,64],core:[199,49,41],inkline:'rgba(20,20,18,',grain:.07},
+};
+function mixc(a,b,t){return[a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t,a[2]+(b[2]-a[2])*t];}
+function css(c,a=1){return`rgba(${c[0]|0},${c[1]|0},${c[2]|0},${a})`;}
+
+/* ---------- scene state ---------- */
+const STATES=[
+  {mode:'single',explode:.10,scale:1,  offX:.24,offY:.02,ghost:1,  glow:1,  theme:0,rot:.10,callout:0},
+  {mode:'single',explode:.34,scale:.9, offX:.27,offY:-.04,ghost:.9,glow:.8, theme:0,rot:.12,callout:0},
+  {mode:'loop',  explode:.30,scale:.46,offX:.20,offY:0,  ghost:1,  glow:.9, theme:0,rot:.10,callout:0},
+  {mode:'single',explode:.42,scale:.95,offX:.27,offY:.02,ghost:1,  glow:1,  theme:0,rot:.06,callout:0},
+  {mode:'single',explode:.5, scale:.7, offX:.29,offY:.1, ghost:.35,glow:.5, theme:0,rot:.08,callout:0},
+  {mode:'single',explode:.78,scale:.9, offX:.27,offY:.03,ghost:1,  glow:1,  theme:0,rot:.04,callout:1},
+  {mode:'single',explode:.55,scale:.85,offX:.26,offY:.04,ghost:.9, glow:.8, theme:1,rot:.08,callout:0},
+  {mode:'single',explode:.06,scale:1,  offX:.26,offY:.02,ghost:1,  glow:1.1,theme:0,rot:.14,callout:0},
+];
+const SCN={mode:'single',explode:.1,scale:1,offX:.24,offY:.02,ghost:1,glow:1,theme:0,rot:.1,callout:0};
+let target=STATES[0],activeIdx=-1;
+function setState(i){
+  if(i===activeIdx)return;activeIdx=i;
+  target=STATES[i];
+  document.body.classList.toggle('lt',STATES[i].theme===1);
+  document.querySelectorAll('#rail a').forEach((a,k)=>a.classList.toggle('on',k===i));
+}
+function lerpScene(dt){
+  const k=1-Math.exp(-dt*3.2);
+  for(const key of['explode','scale','offX','offY','ghost','glow','theme','rot','callout'])SCN[key]+=((target[key]-SCN[key])*k);
+  if(target.mode!==SCN.mode&&(Math.abs(target.scale-SCN.scale)<.02))SCN.mode=target.mode;
+}
+
+/* ---------- render ---------- */
+let noiseCv=null;
+function makeNoise(){
+  noiseCv=document.createElement('canvas');noiseCv.width=noiseCv.height=140;
+  const n=noiseCv.getContext('2d'),id=n.createImageData(140,140);
+  for(let i=0;i<id.data.length;i+=4){const v=Math.random()*255;id.data[i]=id.data[i+1]=id.data[i+2]=v;id.data[i+3]=255;}
+  n.putImageData(id,0,0);
+}
+makeNoise();
+
+function drawMachine(origin,scale,explode,theme,ghost,glow,t,withCallout){
+  const T=theme>.5?THEME.light:THEME.dark;
+  const plates=buildFaces(origin,scale,explode,Math.sin(t*1.1)*0.02*scale);
+  // project + shade
+  const drawn=[];
+  for(const f of plates){
+    const pts=f.p.map(proj);
+    if(pts.some(p=>p.z<.5))continue;
+    const cz=pts.reduce((s,p)=>s+p.z,0)/4;
+    // backface cull in view space
+    const nView=norm(cross(sub(f.p[1],f.p[0]),sub(f.p[3],f.p[0])));
+    const toCam=norm(sub(V(CB.eye.x,CB.eye.y,CB.eye.z),f.p[0]));
+    if(dot(nView,toCam)<=0.02)continue;
+    const lam=Math.max(0,dot(nView,LIGHT));
+    drawn.push({pts,cz,m:f.m,lam});
+  }
+  drawn.sort((a,b)=>b.cz-a.cz);
+  // core halos first
+  if(glow>0.05){
+    for(const p of PLATES){
+      if(p.m!=='core')continue;
+      const pi=PLATES.indexOf(p);
+      const c=proj(V(origin.x,origin.y+(p.y-pi*explode*.34)*scale,origin.z));
+      const r=p.r*scale*c.s*.9;
+      const g=ctx.createRadialGradient(c.x,c.y,0,c.x,c.y,r*2.1);
+      const col=THEME.dark.core;
+      g.addColorStop(0,`rgba(${col[0]},${col[1]},${col[2]},${.5*glow*ghost})`);
+      g.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.fillStyle=g;
+      ctx.beginPath();ctx.arc(c.x,c.y,r*2.1,0,7);ctx.fill();
+    }
+  }
+  for(const d of drawn){
+    let base;
+    if(d.m==='light')base=T.light;
+    else if(d.m==='dark')base=T.darkp;
+    else base=T.core;
+    const sh=.32+.68*d.lam;
+    let col;
+    if(d.m==='core'){col=base.map(v=>Math.min(255,v*(0.72+0.5*d.lam)));}
+    else col=mixc(T.bg,base,sh);
+    ctx.fillStyle=css(col,ghost);
+    ctx.beginPath();
+    ctx.moveTo(d.pts[0].x,d.pts[0].y);
+    for(let i=1;i<4;i++)ctx.lineTo(d.pts[i].x,d.pts[i].y);
+    ctx.closePath();ctx.fill();
+    if(d.m!=='core'){ctx.strokeStyle=T.inkline+(0.10*ghost)+')';ctx.lineWidth=.7;ctx.stroke();}
+  }
+  return{origin,scale,explode};
+}
+
+function drawArc(theme,t){
+  // red orbital arrows between loop machines
+  const col=THEME.dark.core;
+  ctx.save();
+  ctx.strokeStyle=`rgba(${col[0]},${col[1]},${col[2]},.85)`;
+  ctx.lineWidth=1.6;
+  const R=1.9,y=.15;
+  for(let k=0;k<3;k++){
+    const a0=(k/3)*Math.PI*2+.42+SCN.loopPh,a1=((k+1)/3)*Math.PI*2-.42+SCN.loopPh;
+    ctx.setLineDash([5,5]);
+    ctx.lineDashOffset=-t*26;
+    ctx.beginPath();
+    let first=true,last=null;
+    for(let a=a0;a<=a1;a+=.08){
+      const p=proj(V(Math.cos(a)*R,y,Math.sin(a)*R));
+      if(p.z<.5)continue;
+      if(first){ctx.moveTo(p.x,p.y);first=false;}else ctx.lineTo(p.x,p.y);
+      last={p,a};
+    }
+    ctx.stroke();
+    if(last){
+      const p2=proj(V(Math.cos(last.a+.06)*R,y,Math.sin(last.a+.06)*R));
+      const ang=Math.atan2(p2.y-last.p.y,p2.x-last.p.x);
+      ctx.setLineDash([]);
+      ctx.beginPath();
+      ctx.moveTo(last.p.x,last.p.y);
+      ctx.lineTo(last.p.x-9*Math.cos(ang-.42),last.p.y-9*Math.sin(ang-.42));
+      ctx.moveTo(last.p.x,last.p.y);
+      ctx.lineTo(last.p.x-9*Math.cos(ang+.42),last.p.y-9*Math.sin(ang+.42));
+      ctx.stroke();
+    }
+  }
+  ctx.restore();
+}
+function drawLoopLabels(){
+  const names=['MODEL','AI RESEARCH','NEXT MODEL'];
+  ctx.save();
+  ctx.font='500 10px "IBM Plex Mono",monospace';
+  ctx.fillStyle='rgba(236,234,228,.75)';
+  ctx.textAlign='center';
+  for(let k=0;k<3;k++){
+    const a=(k/3)*Math.PI*2+SCN.loopPh;
+    const p=proj(V(Math.cos(a)*2.35,.85,Math.sin(a)*2.35));
+    if(p.z<.5)continue;
+    ctx.save();
+    ctx.translate(p.x,p.y);
+    ctx.fillText(names[k].split('').join('\u200a'),0,0);
+    ctx.restore();
+    // tick toward center
+    const p2=proj(V(Math.cos(a)*2.1,.55,Math.sin(a)*2.1));
+    ctx.strokeStyle='rgba(236,234,228,.25)';
+    ctx.beginPath();ctx.moveTo(p2.x,p2.y);ctx.lineTo(p.x,p.y-(p.y>p2.y?10:-10));ctx.stroke();
+  }
+  ctx.restore();
+}
+function drawCallouts(theme){
+  const T=theme>.5?THEME.light:THEME.dark;
+  const items=[
+    {label:'INTENDED GOALS',plate:0,dy:-.1},
+    {label:'RELIABLE BEHAVIOR',plate:2,dy:.1},
+  ];
+  ctx.save();
+  ctx.font='500 10px "IBM Plex Mono",monospace';
+  for(const it of items){
+    const p=PLATES[it.plate],pi=it.plate;
+    const world=V(SCN.machO.x+p.r*SCN.scale,SCN.machO.y+(p.y-pi*SCN.explode*.34)*SCN.scale+it.dy,SCN.machO.z);
+    const a=proj(world);
+    const bx=a.x+46,by=a.y+(it.plate===0?-34:38);
+    ctx.strokeStyle=T.inkline+'0.95)';
+    ctx.lineWidth=1;
+    ctx.beginPath();
+    ctx.moveTo(a.x,a.y);ctx.lineTo(bx,by);ctx.lineTo(bx+118,by);
+    ctx.stroke();
+    ctx.fillStyle=css(THEME.dark.core,.9);
+    ctx.fillRect(a.x-2.5,a.y-2.5,5,5);
+    ctx.fillStyle=theme>.5?'rgba(20,20,18,.85)':'rgba(236,234,228,.85)';
+    ctx.textAlign='left';
+    ctx.fillText(it.label.split('').join('\u200a'),bx+6,by-7);
+  }
+  ctx.restore();
+}
+
+/* ---------- main loop ---------- */
+SCN.loopPh=0;
+let lastT=0;
+const mC=V(0,0,0);
+function frame(ts){
+  const t=ts/1000,dt=Math.min(.05,t-lastT||.016);lastT=t;
+  lerpScene(dt);
+  if(!RM){CAM.ang+=SCN.rot*dt;}
+  const bg=mixc(THEME.dark.bg,THEME.light.bg,SCN.theme);
+  ctx.fillStyle=css(bg);ctx.fillRect(0,0,W,H);
+  // grain
+  if(!SCN.grainPat)SCN.grainPat=ctx.createPattern(noiseCv,'repeat');
+  ctx.globalAlpha=SCN.theme>.5?.028:.02;
+  ctx.fillStyle=SCN.grainPat;ctx.fillRect(0,0,W,H);
+  ctx.globalAlpha=1;
+  CB=camBasis();
+  const narrow=W<760;
+  const saveOffX=SCN.offX,saveGhost=SCN.ghost;
+  if(narrow){SCN.offX=0;SCN.ghost*=.55;}
+  if(SCN.mode==='loop'){
+    SCN.loopPh+= (RM?0:dt*.16);
+    for(let k=0;k<3;k++){
+      const a=(k/3)*Math.PI*2+SCN.loopPh;
+      const o=V(Math.cos(a)*1.9,.15,Math.sin(a)*1.9);
+      SCN.machO=o;
+      drawMachine(o,SCN.scale,SCN.explode,SCN.theme,SCN.ghost,SCN.glow,t,false);
+    }
+    drawArc(SCN.theme,t);
+    drawLoopLabels();
+  }else{
+    SCN.machO=mC;
+    drawMachine(mC,SCN.scale*(narrow?.72:1),SCN.explode,SCN.theme,SCN.ghost,SCN.glow,SCN.callout>.5?t:t,false);
+    if(SCN.callout>.5)drawCallouts(SCN.theme);
+  }
+  SCN.offX=saveOffX;SCN.ghost=saveGhost;
+  // vignette
+  const vg=ctx.createRadialGradient(W/2,H/2,H*.42,W/2,H/2,H*.95);
+  vg.addColorStop(0,'rgba(0,0,0,0)');
+  vg.addColorStop(1,`rgba(0,0,0,${SCN.theme>.5?.10:.34})`);
+  ctx.fillStyle=vg;ctx.fillRect(0,0,W,H);
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+
+/* ---------- rail ---------- */
+const rail=document.getElementById('rail');
+const secs=[...document.querySelectorAll('section.sec')];
+secs.forEach((s,i)=>{
+  const a=document.createElement('a');
+  a.href='#'+s.id;a.innerHTML=`<i></i>0${i}`;
+  rail.appendChild(a);
+});
+
+/* ---------- section observer ---------- */
+const io=new IntersectionObserver(es=>{
+  es.forEach(e=>{if(e.isIntersecting)setState(secs.indexOf(e.target));});
+},{threshold:.45});
+secs.forEach(s=>io.observe(s));
+
+/* ---------- reveal ---------- */
+const rio=new IntersectionObserver(es=>{
+  es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');rio.unobserve(e.target);}});
+},{threshold:.12});
+document.querySelectorAll('.rev').forEach(el=>rio.observe(el));
+
+/* ---------- slider ---------- */
+let sliderV=+localStorage.getItem('fn003.pressure')||.5;
+const track=document.getElementById('sliderTrack'),fill=document.getElementById('sliderFill'),
+      thumb=document.getElementById('sliderThumb'),pval=document.getElementById('pressVal');
+const slabEls=[...document.querySelectorAll('.sliderlab span')];
+function setSlider(v,save){
+  sliderV=Math.max(0,Math.min(1,v));
+  fill.style.width=(sliderV*100)+'%';
+  thumb.style.left=(sliderV*100)+'%';
+  pval.textContent=sliderV.toFixed(2);
+  track.setAttribute('aria-valuenow',Math.round(sliderV*100));
+  const b=sliderV<.33?0:sliderV<.72?1:2;
+  slabEls.forEach((el,i)=>el.classList.toggle('on',i===b));
+  if(activeIdx===3)STATES[3].glow=.55+sliderV*.8;
+  if(save)localStorage.setItem('fn003.pressure',sliderV);
+}
+function sliderFromEvent(e){
+  const r=track.getBoundingClientRect();
+  setSlider((e.clientX-r.left)/r.width,true);
+}
+let dragging=false;
+track.addEventListener('pointerdown',e=>{dragging=true;track.setPointerCapture(e.pointerId);sliderFromEvent(e);});
+track.addEventListener('pointermove',e=>{if(dragging)sliderFromEvent(e);});
+track.addEventListener('pointerup',()=>dragging=false);
+track.addEventListener('keydown',e=>{
+  if(e.key==='ArrowLeft'||e.key==='ArrowDown'){setSlider(sliderV-.05,true);e.preventDefault();}
+  if(e.key==='ArrowRight'||e.key==='ArrowUp'){setSlider(sliderV+.05,true);e.preventDefault();}
+});
+setSlider(sliderV,false);
+
+/* ---------- vote ---------- */
+const VKEY='fn003.tally';
+const tally=JSON.parse(localStorage.getItem(VKEY)||'{"labs":0,"gov":0,"pub":0}');
+const myVoteKey='fn003.myvote';
+const voteBox=document.getElementById('voteBox'),tallyEl=document.getElementById('tally');
+function renderTally(){
+  const tot=tally.labs+tally.gov+tally.pub;
+  if(!tot){tallyEl.classList.remove('show');return;}
+  tallyEl.classList.add('show');
+  for(const k of['labs','gov','pub']){
+    const pc=Math.round(tally[k]/tot*100);
+    document.getElementById('b-'+k).style.width=pc+'%';
+    document.getElementById('p-'+k).textContent=pc+'%';
+  }
+  document.getElementById('tallyNote').textContent=tot+' RECORDED ON THIS DEVICE ONLY';
+}
+function markSel(){
+  const mine=localStorage.getItem(myVoteKey);
+  voteBox.querySelectorAll('button').forEach(b=>b.classList.toggle('sel',b.dataset.v===mine));
+}
+voteBox.querySelectorAll('button').forEach(b=>{
+  b.addEventListener('click',()=>{
+    const prev=localStorage.getItem(myVoteKey);
+    if(prev===b.dataset.v){return;}
+    if(prev&&tally[prev]>0)tally[prev]--;
+    tally[b.dataset.v]++;
+    localStorage.setItem(VKEY,JSON.stringify(tally));
+    localStorage.setItem(myVoteKey,b.dataset.v);
+    markSel();renderTally();
+  });
+});
+markSel();renderTally();
+
+/* ---------- cta ---------- */
+const cta=document.getElementById('ctaBtn');
+cta.addEventListener('click',async()=>{
+  const line='FIELDNOTES 003 - A warning from inside. Who should set acceptable risk: the labs, governments, or the public? '+location.href;
+  try{await navigator.clipboard.writeText(line);cta.textContent='COPIED - SEND IT TO SOMEONE';cta.classList.add('copied');}
+  catch(e){document.getElementById('s7').scrollIntoView({behavior:'smooth'});}
+  setTimeout(()=>{cta.innerHTML='WHAT DO YOU THINK? &nbsp;&rarr;';cta.classList.remove('copied');},2600);
+});
+
+/* ---------- keys ---------- */
+addEventListener('keydown',e=>{
+  if(['INPUT','TEXTAREA'].includes(document.activeElement.tagName))return;
+  if(e.key==='ArrowDown'||e.key==='j'){secs[Math.min(secs.length-1,activeIdx+1)].scrollIntoView({behavior:'smooth'});}
+  if(e.key==='ArrowUp'||e.key==='k'){secs[Math.max(0,activeIdx-1)].scrollIntoView({behavior:'smooth'});}
+});
+setState(0);
+</script>
+</body>
+</html>
